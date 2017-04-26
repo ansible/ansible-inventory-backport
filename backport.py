@@ -36,7 +36,8 @@ except ImportError:
     from ansible.utils.display import Display
     display = Display()
 
-INTERNAL_VARS = frozenset([ 'ansible_version',
+INTERNAL_VARS = frozenset([ 'ansible_facts',
+                            'ansible_version',
                             'ansible_playbook_python',
                             'inventory_dir',
                             'inventory_file',
