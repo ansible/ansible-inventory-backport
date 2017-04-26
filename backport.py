@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # (c) 2017, Brian Coca <bcoca@ansible.com>
 #
 # Ansible is free software: you can redistribute it and/or modify
@@ -20,6 +22,7 @@ __metaclass__ = type
 import optparse
 from operator import attrgetter
 
+from ansible import constants as C
 from ansible.cli import CLI
 from ansible.errors import AnsibleOptionsError
 from ansible.inventory import Inventory
@@ -81,7 +84,40 @@ class InventoryCLI(CLI):
         self.parser.add_option("--vars", action="store_true", default=False, dest='show_vars',
                                 help='Add vars to graph display, ignored unless used with --graph')
 
-        super(InventoryCLI, self).parse()
+        try:
+            super(InventoryCLI, self).parse()
+        except Exception as e:
+            if 'Need to implement!' not in e.args[0]:
+                raise
+            # --- Start of 2.3+ super(InventoryCLI, self).parse() ---
+            self.options, self.args = self.parser.parse_args(self.args[1:])
+            if hasattr(self.options, 'tags') and not self.options.tags:
+                # optparse defaults does not do what's expected
+                self.options.tags = ['all']
+            if hasattr(self.options, 'tags') and self.options.tags:
+                if not C.MERGE_MULTIPLE_CLI_TAGS:
+                    if len(self.options.tags) > 1:
+                        display.deprecated('Specifying --tags multiple times on the command line currently uses the last specified value. In 2.4, values will be merged instead.  Set merge_multiple_cli_tags=True in ansible.cfg to get this behavior now.', version=2.5, removed=False)
+                        self.options.tags = [self.options.tags[-1]]
+
+                tags = set()
+                for tag_set in self.options.tags:
+                    for tag in tag_set.split(u','):
+                        tags.add(tag.strip())
+                self.options.tags = list(tags)
+
+            if hasattr(self.options, 'skip_tags') and self.options.skip_tags:
+                if not C.MERGE_MULTIPLE_CLI_TAGS:
+                    if len(self.options.skip_tags) > 1:
+                        display.deprecated('Specifying --skip-tags multiple times on the command line currently uses the last specified value. In 2.4, values will be merged instead.  Set merge_multiple_cli_tags=True in ansible.cfg to get this behavior now.', version=2.5, removed=False)
+                        self.options.skip_tags = [self.options.skip_tags[-1]]
+
+                skip_tags = set()
+                for tag_set in self.options.skip_tags:
+                    for tag in tag_set.split(u','):
+                        skip_tags.add(tag.strip())
+                self.options.skip_tags = list(skip_tags)
+            # --- End of 2.3+ super(InventoryCLI, self).parse() ---
 
         display.verbosity = self.options.verbosity
 
@@ -280,3 +316,14 @@ class InventoryCLI(CLI):
 
 
         return format_group(top)
+
+
+if __name__ == '__main__':
+    import imp
+    import subprocess
+    import sys
+    with open(__file__) as f:
+        imp.load_source('ansible.cli.inventory', __file__ + '.py', f)
+    ansible_path = subprocess.check_output(['which', 'ansible']).strip()
+    sys.argv[0] = 'ansible-inventory'
+    execfile(ansible_path)
