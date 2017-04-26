@@ -47,14 +47,15 @@ INTERNAL_VARS = frozenset([ 'ansible_facts',
                             'group_names',
                             'omit',
                             'playbook_dir',
-                         ])
+                            ])
+
 
 class InventoryCLI(CLI):
     ''' used to display or dump the configured inventory as Ansible sees it '''
 
     ARGUMENTS = { 'host': 'The name of a host to match in the inventory, relevant when using --list',
                   'group': 'The name of a group in the inventory, relevant when using --graph',
-    }
+                  }
 
     def __init__(self, args):
 
@@ -73,7 +74,7 @@ class InventoryCLI(CLI):
 
         # Actions
         action_group = optparse.OptionGroup(self.parser, "Actions", "One of following must be used on invocation, ONLY ONE!")
-        action_group.add_option("--list", action="store_true", default=False,dest='list', help='Output all hosts info, works as inventory script')
+        action_group.add_option("--list", action="store_true", default=False, dest='list', help='Output all hosts info, works as inventory script')
         action_group.add_option("--host", action="store", default=None, dest='host', help='Output specific host info, works as inventory script')
         action_group.add_option("--graph", action="store_true", default=False, dest='graph',
                                 help='create inventory graph, if supplying pattern it must be a valid group name')
@@ -81,9 +82,9 @@ class InventoryCLI(CLI):
 
         # Options
         self.parser.add_option("-y", "--yaml", action="store_true", default=False, dest='yaml',
-                                help='Use YAML format instead of default JSON, ignored for --graph')
+                               help='Use YAML format instead of default JSON, ignored for --graph')
         self.parser.add_option("--vars", action="store_true", default=False, dest='show_vars',
-                                help='Add vars to graph display, ignored unless used with --graph')
+                               help='Add vars to graph display, ignored unless used with --graph')
 
         try:
             super(InventoryCLI, self).parse()
@@ -140,7 +141,6 @@ class InventoryCLI(CLI):
         else:
             self.options.pattern = 'all'
 
-
     def run(self):
 
         results = None
@@ -174,7 +174,7 @@ class InventoryCLI(CLI):
             myvars = self.vm.get_vars(self.loader, host=hosts[0])
             self._remove_internal(myvars)
 
-            #FIXME: should we template first?
+            # FIXME: should we template first?
             results = self.dump(myvars)
 
         elif self.options.graph:
@@ -193,7 +193,6 @@ class InventoryCLI(CLI):
 
         exit(1)
 
-
     def dump(self, stuff):
 
         if self.options.yaml:
@@ -205,7 +204,6 @@ class InventoryCLI(CLI):
             results = json.dumps(stuff, sort_keys=True, indent=4)
 
         return results
-
 
     def _remove_internal(self, dump):
 
@@ -223,8 +221,8 @@ class InventoryCLI(CLI):
         result = []
         self._remove_internal(dump)
         if self.options.show_vars:
-            for (name,val) in sorted(dump.items()):
-                result.append(self._graph_name('{%s = %s}' % (name, val), depth+1))
+            for (name, val) in sorted(dump.items()):
+                result.append(self._graph_name('{%s = %s}' % (name, val), depth + 1))
         return result
 
     def _graph_name(self, name, depth=0):
@@ -255,7 +253,6 @@ class InventoryCLI(CLI):
             return '\n'.join(self._graph_group(start_at))
         else:
             raise AnsibleOptionsError("Pattern must be valid group name when using --graph")
-
 
     def json_inventory(self, top):
 
@@ -306,7 +303,7 @@ class InventoryCLI(CLI):
             if group.name != 'all':
                 for h in sorted(group.hosts, key=attrgetter('name')):
                     myvars = {}
-                    if h.name not in seen: # avoid defining host vars more than once
+                    if h.name not in seen:  # avoid defining host vars more than once
                         seen.append(h.name)
                         myvars = self.vm.get_vars(self.loader, host=h)
                         self._remove_internal(myvars)
@@ -314,7 +311,6 @@ class InventoryCLI(CLI):
 
             self._remove_empty(results[group.name])
             return results
-
 
         return format_group(top)
 
