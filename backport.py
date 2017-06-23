@@ -261,7 +261,8 @@ class InventoryCLI(CLI):
             results[group.name] = {}
             if group.name != 'all':
                 results[group.name]['hosts'] = [h.name for h in sorted(group.hosts, key=attrgetter('name'))]
-            results[group.name]['vars'] = group.get_vars()
+            # NOTE: vars are not added, because vars in group_vars files can not be obtained
+            # results[group.name]['vars'] = group.get_vars()
             results[group.name]['children'] = []
             for subgroup in sorted(group.child_groups, key=attrgetter('name')):
                 results[group.name]['children'].append(subgroup.name)
