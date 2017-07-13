@@ -24,15 +24,7 @@ EXAMPLE_FILE = os.path.join(TEST_DIR, 'data', 'legacy', 'inventory.ini')
 def command():
     def make_command(args):
         instance = InventoryCLI(args)
-        instance.options = argparse.ArgumentParser(description='Process some integers.')
-        instance.options.verbosity = 0
-        instance.options.vault_password_file = None
-        instance.options.ask_vault_pass = False
-        instance.options.inventory = __file__
-        instance.options.host = None
-        instance.options.graph = False
-        instance.options.list = True
-        instance.options.yaml = False
+        instance.parse()
         return instance
     return make_command
 
