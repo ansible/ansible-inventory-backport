@@ -4,12 +4,14 @@ python:
   - "2.7"
 
 env:
-  - ANSIBLE_VERSION=2.2.0.0
-  - ANSIBLE_VERSION=2.3.0.0
+  - ANSIBLE_VERSION="ansible==2.2"
+  - ANSIBLE_VERSION="ansible==2.3"
+  - ANSIBLE_VERSION="git+https://github.com/ansible/ansible.git@devel"
 
 install:
-  - pip install -q ansible==$ANSIBLE_VERSION
+  - pip install pytest
+  - pip install -q $ANSIBLE_VERSION
 
 script:
-  - pytest tests/
-  - flake8
+  - ansible --version
+  - py.test tests/
