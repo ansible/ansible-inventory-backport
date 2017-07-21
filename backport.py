@@ -91,35 +91,6 @@ class InventoryCLI(CLI):
         except Exception as e:
             if 'Need to implement!' not in e.args[0]:
                 raise
-            # --- Start of 2.3+ super(InventoryCLI, self).parse() ---
-            self.options, self.args = self.parser.parse_args(self.args[1:])
-            if hasattr(self.options, 'tags') and not self.options.tags:
-                # optparse defaults does not do what's expected
-                self.options.tags = ['all']
-            if hasattr(self.options, 'tags') and self.options.tags:
-                if not C.MERGE_MULTIPLE_CLI_TAGS:
-                    if len(self.options.tags) > 1:
-                        display.deprecated('Specifying --tags multiple times on the command line currently uses the last specified value. In 2.4, values will be merged instead.  Set merge_multiple_cli_tags=True in ansible.cfg to get this behavior now.', version=2.5, removed=False)
-                        self.options.tags = [self.options.tags[-1]]
-
-                tags = set()
-                for tag_set in self.options.tags:
-                    for tag in tag_set.split(u','):
-                        tags.add(tag.strip())
-                self.options.tags = list(tags)
-
-            if hasattr(self.options, 'skip_tags') and self.options.skip_tags:
-                if not C.MERGE_MULTIPLE_CLI_TAGS:
-                    if len(self.options.skip_tags) > 1:
-                        display.deprecated('Specifying --skip-tags multiple times on the command line currently uses the last specified value. In 2.4, values will be merged instead.  Set merge_multiple_cli_tags=True in ansible.cfg to get this behavior now.', version=2.5, removed=False)
-                        self.options.skip_tags = [self.options.skip_tags[-1]]
-
-                skip_tags = set()
-                for tag_set in self.options.skip_tags:
-                    for tag in tag_set.split(u','):
-                        skip_tags.add(tag.strip())
-                self.options.skip_tags = list(skip_tags)
-            # --- End of 2.3+ super(InventoryCLI, self).parse() ---
 
         display.verbosity = self.options.verbosity
 
