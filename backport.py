@@ -43,14 +43,15 @@ INTERNAL_VARS = frozenset([ 'ansible_facts',
                             'group_names',
                             'omit',
                             'playbook_dir',
-                         ])
+                            ])
+
 
 class InventoryCLI(CLI):
     ''' used to display or dump the configured inventory as Ansible sees it '''
 
     ARGUMENTS = { 'host': 'The name of a host to match in the inventory, relevant when using --list',
                   'group': 'The name of a group in the inventory, relevant when using --graph',
-    }
+                  }
 
     def __init__(self, args):
 
@@ -75,7 +76,7 @@ class InventoryCLI(CLI):
 
         # Actions
         action_group = optparse.OptionGroup(self.parser, "Actions", "One of following must be used on invocation, ONLY ONE!")
-        action_group.add_option("--list", action="store_true", default=False,dest='list', help='Output all hosts info, works as inventory script')
+        action_group.add_option("--list", action="store_true", default=False, dest='list', help='Output all hosts info, works as inventory script')
         action_group.add_option("--host", action="store", default=None, dest='host', help='Output specific host info, works as inventory script')
         action_group.add_option("--graph", action="store_true", default=False, dest='graph',
                                 help='create inventory graph, if supplying pattern it must be a valid group name')
@@ -149,7 +150,6 @@ class InventoryCLI(CLI):
             self.inventory = Inventory(loader=self.loader, variable_manager=self.vm, host_list=self.options.inventory)
             self.vm.set_inventory(self.inventory)
 
-
         if self.options.host:
             hosts = self.inventory.get_hosts(self.options.host)
             if len(hosts) != 1:
@@ -158,7 +158,7 @@ class InventoryCLI(CLI):
             myvars = self._get_host_variables(host=hosts[0])
             self._remove_internal(myvars)
 
-            #FIXME: should we template first?
+            # FIXME: should we template first?
             results = self.dump(myvars)
 
         elif self.options.graph:
@@ -172,7 +172,7 @@ class InventoryCLI(CLI):
             results = self.dump(results)
 
         if results:
-            #FIXME: pager?
+            # FIXME: pager?
             display.display(results)
             exit(0)
 
@@ -192,9 +192,9 @@ class InventoryCLI(CLI):
 
     def _get_host_variables(self, host):
         if self._new_api:
-           hostvars =  self.vm.get_vars(host=host)
+            hostvars = self.vm.get_vars(host=host)
         else:
-           hostvars =  self.vm.get_vars(self.loader, host=host)
+            hostvars = self.vm.get_vars(self.loader, host=host)
         return hostvars
 
     def _get_group(self, gname):
