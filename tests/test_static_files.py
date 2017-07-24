@@ -5,7 +5,6 @@ import json
 # python
 import os
 import sys
-import argparse
 
 # Add awx/plugins to sys.path so we can use the plugin
 TEST_DIR = os.path.dirname(__file__)

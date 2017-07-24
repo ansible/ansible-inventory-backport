@@ -10,8 +10,10 @@ env:
 
 install:
   - pip install pytest
+  - pip install flake8
   - pip install -q $ANSIBLE_VERSION
 
 script:
   - ansible --version
   - py.test tests/
+  - flake8

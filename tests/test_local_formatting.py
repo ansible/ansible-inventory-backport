@@ -1,11 +1,9 @@
 import pytest
-import mock
 import json
 
 # python
 import os
 import sys
-import argparse
 import cStringIO
 
 # Add awx/plugins to sys.path so we can use the plugin
@@ -53,7 +51,6 @@ def test_full_group_vars():
         "hostvar_file": "defined_in_host_vars"
     } == inv_dict['_meta']['hostvars']['host_1']
     assert {
-        "groupvar_file": "defined_in_group_vars", 
+        "groupvar_file": "defined_in_group_vars",
         "groupvar_inventory": "defined_in_inventory_file"
     } == inv_dict['group_1']['vars']
-
