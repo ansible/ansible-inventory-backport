@@ -32,6 +32,11 @@ except ImportError:
     from ansible.utils.display import Display
     display = Display()
 
+try:
+    from ansible.cli.inventory import InventoryCLI as ansible_CLI
+except ImportError:
+    ansible_CLI = None
+
 INTERNAL_VARS = frozenset([ 'ansible_facts',
                             'ansible_version',
                             'ansible_playbook_python',
@@ -315,11 +320,17 @@ class InventoryCLI(CLI):
 
 
 if __name__ == '__main__':
-    import imp
-    import subprocess
     import sys
-    with open(__file__) as f:
-        imp.load_source('ansible.cli.inventory', __file__ + '.py', f)
-    ansible_path = subprocess.check_output(['which', 'ansible']).strip()
     sys.argv[0] = 'ansible-inventory'
-    execfile(ansible_path)
+    if ansible_CLI:
+        sys.argv.append('--optimize')
+        run = ansible_CLI(sys.argv)
+        run.parse()
+        run.run()
+    else:
+        import imp
+        import subprocess
+        with open(__file__) as f:
+            imp.load_source('ansible.cli.inventory', __file__ + '.py', f)
+        ansible_path = subprocess.check_output(['which', 'ansible']).strip()
+        execfile(ansible_path)
