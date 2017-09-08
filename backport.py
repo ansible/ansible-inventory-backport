@@ -21,6 +21,7 @@ __metaclass__ = type
 
 import optparse
 from operator import attrgetter
+import os
 
 from ansible.cli import CLI
 from ansible.errors import AnsibleOptionsError
@@ -314,12 +315,17 @@ class InventoryCLI(CLI):
         return format_group(top)
 
 
+def which(binary):
+    for possible in os.environ.get('PATH').split(':'):
+        if os.path.exists(os.path.join(possible, binary)):
+            return os.path.join(possible, binary)
+
+
 if __name__ == '__main__':
     import imp
-    import subprocess
     import sys
     with open(__file__) as f:
         imp.load_source('ansible.cli.inventory', __file__ + '.py', f)
-    ansible_path = subprocess.check_output(['which', 'ansible']).strip()
+    ansible_path = which('ansible')
     sys.argv[0] = 'ansible-inventory'
     execfile(ansible_path)
