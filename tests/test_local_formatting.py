@@ -28,7 +28,7 @@ EXAMPLE_FILE = os.path.join(TEST_DIR, 'data', 'everything', 'inventory.ini')
 
 @pytest.mark.skipif(ansible_CLI is None, reason="Only testing post-2.4 behavior")
 def test_full_group_vars():
-    run = ansible_CLI(['ansible-inventory', '-i', EXAMPLE_FILE, '--local', '--list'])
+    run = ansible_CLI(['ansible-inventory', '-i', EXAMPLE_FILE, '--list'])
     run.parse()
     stdout_ = sys.stdout
     stream = cStringIO.StringIO()
