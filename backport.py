@@ -27,7 +27,12 @@ from ansible import constants as C
 from ansible.cli import CLI
 from ansible.errors import AnsibleError, AnsibleOptionsError
 from ansible.inventory.host import Host
-from ansible.plugins.loader import vars_loader
+
+try:
+    from ansible.plugins.loader import vars_loader
+except ImportError:
+    vars_loader = None
+
 from ansible.parsing.dataloader import DataLoader
 from ansible.utils.vars import combine_vars
 
@@ -237,13 +242,16 @@ class InventoryCLI(CLI):
         # get info from inventory source
         res = group.get_vars()
 
-        # FIXME: add switch to skip vars plugins
-        # add vars plugin info
-        for inventory_dir in self.inventory._sources:
-            res = combine_vars(res, self.get_plugin_vars(inventory_dir, group))
+        try:
+            # FIXME: add switch to skip vars plugins
+            # add vars plugin info
+            for inventory_dir in self.inventory._sources:
+                res = combine_vars(res, self.get_plugin_vars(inventory_dir, group))
 
-        if group.priority != 1:
-            res['ansible_group_priority'] = group.priority
+            if group.priority != 1:
+                res['ansible_group_priority'] = group.priority
+        except AttributeError:
+            pass
 
         return res
 
@@ -252,10 +260,13 @@ class InventoryCLI(CLI):
         if self.options.export:
             hostvars = host.get_vars()
 
-            # FIXME: add switch to skip vars plugins
-            # add vars plugin info
-            for inventory_dir in self.inventory._sources:
-                hostvars = combine_vars(hostvars, self.get_plugin_vars(inventory_dir, host))
+            try:
+                # FIXME: add switch to skip vars plugins
+                # add vars plugin info
+                for inventory_dir in self.inventory._sources:
+                    hostvars = combine_vars(hostvars, self.get_plugin_vars(inventory_dir, host))
+            except AttributeError:
+                pass
         else:
             if self._new_api:
                 hostvars = self.vm.get_vars(host=host, include_hostvars=False)
