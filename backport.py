@@ -396,7 +396,6 @@ class InventoryCLI(CLI):
                     results[group.name]['vars'] = gvars
 
             self._remove_empty(results[group.name])
-
             return results
 
         return format_group(top)
